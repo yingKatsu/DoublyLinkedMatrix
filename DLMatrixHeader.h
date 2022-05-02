@@ -260,6 +260,7 @@ public:
 		}
 	}
 
+	/*
 	//this function tests the connections of the matrix
 	//THIS FUNCTION WILL OVERWRITE YOUR DATA
 	void debugPrintConnections() {
@@ -310,7 +311,7 @@ public:
 		}
 		std::cout << std::endl;
 	}
-
+	*/
 
 void printMatrix() {
 	ListNode<T>* curY = head;
