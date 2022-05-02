@@ -10,7 +10,6 @@ class ListNode {
 private:
 	//Fields
 	T data{};
-	bool holdsData;
 
 	ListNode<T>* up;
 	ListNode<T>* down;
@@ -260,9 +259,10 @@ public:
 		}
 	}
 
-	/*
+
 	//this function tests the connections of the matrix
 	//THIS FUNCTION WILL OVERWRITE YOUR DATA
+	//ONLY WORKS IN AN INT MATRIX
 	void debugPrintConnections() {
 		this->formatForDebug();
 
@@ -311,7 +311,7 @@ public:
 		}
 		std::cout << std::endl;
 	}
-	*/
+
 
 void printMatrix() {
 	ListNode<T>* curY = head;
