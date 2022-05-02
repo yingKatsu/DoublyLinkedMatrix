@@ -89,38 +89,13 @@ public:
 		head = new ListNode{ 0 };
 	}
 
-	/* TODO
-	
-
-	//Copy Constructor
-	LinkedList(LinkedList<T>& other) {
-		//size = other.getSize();
-		for (int i = 0; i < other.getSize(); i++) {
-			this->insert(other.get(i), i);
-		}
-	}
-
 	//Destructor
-	~LinkedList() {
-		while (this->size > 0) {
-			this->remove(size - 1);
+	~LinkedMatrix() {
+		for (int i = 0; i < allNodes.size(); i++) {
+			delete allNodes[i];
 		}
 	}
 
-	LinkedList& operator=(LinkedList<T>& other) {
-		//1. delete existing chain
-		while (this->size > 0) {
-			this->remove(size - 1);
-		}
-
-		//2. act like copy constructor
-		for (int i = 0; i < other.getSize(); i++) {
-			this->insert(other.get(i), i);
-		}
-
-		return *this;
-	}
-	*/
 
 	//Methods
 	void expandX(int n) {
