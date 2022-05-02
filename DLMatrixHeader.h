@@ -5,30 +5,20 @@
 #include <string>
 
 //ListNode class
+template <typename T>
 class ListNode {
 private:
 	//Fields
-	int data;
-	ListNode* up;
-	ListNode* down; 
-	ListNode* left;
-	ListNode* right;
+	T data{};
+	bool holdsData;
+
+	ListNode<T>* up;
+	ListNode<T>* down;
+	ListNode<T>* left;
+	ListNode<T>* right;
 public:
-	//Constructors
-	ListNode(int item) {
-		//Basic ListNode constructor
-
-		data = item;
-		up = nullptr;
-		down = nullptr;
-		right = nullptr;
-		left = nullptr;
-	}
-
-	ListNode(ListNode* newUp, ListNode* newDown, ListNode* newLeft, ListNode* newRight) {
+	ListNode(ListNode<T>* newUp, ListNode<T>* newDown, ListNode<T>* newLeft, ListNode<T>* newRight) {
 		//empty Listnode constructor with all pointer parameters
-		data = 0;
-
 		this->up = newUp;
 		this->down = newDown;
 		this->right = newRight;
@@ -36,57 +26,58 @@ public:
 	}
 
 	//Methods
-	int getData() {
+	T getData() {
 		return data; 
 	}
 
-	void setData(int item) {
-		data = item;
+	void setData(T itemptr) {
+		data = itemptr;
 	}
 
-	void setUp(ListNode* newUp) {
+	void setUp(ListNode<T>* newUp) {
 		this->up = newUp;
 	}
 
-	ListNode* getUp() {
+	ListNode<T>* getUp() {
 		return up;
 	}
 
-	void setDown(ListNode* newDown) {
+	void setDown(ListNode<T>* newDown) {
 		this->down = newDown;
 	}
 
-	ListNode* getDown() {
+	ListNode<T>* getDown() {
 		return down;
 	}
 
-	void setLeft(ListNode* newLeft) {
+	void setLeft(ListNode<T>* newLeft) {
 		this->left = newLeft;
 	}
 
-	ListNode* getLeft() {
+	ListNode<T>* getLeft() {
 		return left;
 	}
 
-	void setRight(ListNode* newRight) {
+	void setRight(ListNode<T>* newRight) {
 		this->right = newRight;
 	}
 
-	ListNode* getRight() {
+	ListNode<T>* getRight() {
 		return right;
 	}
 };
 
+template <typename T>
 class LinkedMatrix {
 private:
 	//Fields
-	ListNode* head{nullptr}; //ptr to head of a chain of nodes
+	ListNode<T>* head{nullptr}; //ptr to head of a chain of nodes
 	int width{1}, height{1};
-	std::vector<ListNode*> allNodes;
+	std::vector<ListNode<T>*> allNodes;
 public:
 	//Constructor
 	LinkedMatrix() { 
-		head = new ListNode{ 0 };
+		head = new ListNode<T>{nullptr,nullptr,nullptr,nullptr};
 	}
 
 	//Destructor
@@ -99,10 +90,10 @@ public:
 
 	//Methods
 	void expandX(int n) {
-		ListNode* curY = head;
-		ListNode* curX = nullptr;
-		std::vector<ListNode*> lastSubRowAdded;
-		ListNode* last = nullptr;
+		ListNode<T>* curY = head;
+		ListNode<T>* curX = nullptr;
+		std::vector<ListNode<T>*> lastSubRowAdded;
+		ListNode<T>* last = nullptr;
 
 		//premake the lastSubRow with nullptrs
 		for (int i = 0; i < n; i++) {
@@ -124,7 +115,7 @@ public:
 			//add new nodes to the end of the row we're working with using last as a reference
 			for (int xExpand = 0; xExpand < n; xExpand++) {
 				//new node, attaching it to the row above
-				ListNode* newNode = new ListNode{ lastSubRowAdded[xExpand],nullptr,last,nullptr };
+				ListNode<T>* newNode = new ListNode<T>{ lastSubRowAdded[xExpand],nullptr,last,nullptr };
 
 				//also attach the last node made (to the left) to the new node
 				last->setRight(newNode);
@@ -152,10 +143,10 @@ public:
 	}
 
 	void expandY(int n) {
-		ListNode* curX = head;
-		ListNode* curY = nullptr;
-		std::vector<ListNode*> lastSubColumnAdded;
-		ListNode* last = nullptr;
+		ListNode<T>* curX = head;
+		ListNode<T>* curY = nullptr;
+		std::vector<ListNode<T>*> lastSubColumnAdded;
+		ListNode<T>* last = nullptr;
 
 		//premake the lastSubRow with nullptrs
 		for (int i = 0; i < n; i++) {
@@ -178,7 +169,7 @@ public:
 			//add new nodes to the bottom of the column we're working with using last as a reference
 			for (int yExpand = 0; yExpand < n; yExpand++) {
 				//new node, attaching it to the row above
-				ListNode* newNode = new ListNode{ last,nullptr,lastSubColumnAdded[yExpand],nullptr };
+				ListNode<T>* newNode = new ListNode<T>{ last,nullptr,lastSubColumnAdded[yExpand],nullptr };
 
 				//also attach the last node made (above) to the new node
 				last->setDown(newNode);
@@ -205,12 +196,32 @@ public:
 		height += n;
 	}
 
-	int get(int x,int y) {
+	T get(int xDest,int yDest) {
+		ListNode<T>* cur = head;
 
+		for (int y = 0; y < yDest; y++) {
+			cur = cur->getDown();
+		}
+
+		for (int x = 0; x < xDest; x++) {
+			cur = cur->getRight();
+		}
+
+		return cur->getData();
 	}
 
-	void insert(int item, int x, int y) {
+	void insert(T item, int xDest, int yDest) {
+		ListNode<T>* cur = head;
 
+		for (int y = 0; y < yDest; y++) {
+			cur = cur->getDown();
+		}
+
+		for (int x = 0; x < xDest; x++) {
+			cur = cur->getRight();
+		}
+
+		cur->setData(item);
 	}
 
 	void set(int item, int index) {
@@ -229,8 +240,8 @@ public:
 	//sets the data of every node to its position in the matrix (formatted as a 2-digit number xy)
 	//only really designed to test matrixes with dimensions that dont extend beyond 2 dimensions :P
 	void formatForDebug(){
-		ListNode* curY = head;
-		ListNode* curX = nullptr;
+		ListNode<T>* curY = head;
+		ListNode<T>* curX = nullptr;
 		for (int y = 1; y <= height; y++) {
 			curX = curY;
 			for (int x = 1; x <= width; x++) {
@@ -254,8 +265,8 @@ public:
 	void debugPrintConnections() {
 		this->formatForDebug();
 
-		ListNode* curY = head;
-		ListNode* curX = nullptr;
+		ListNode<T>* curY = head;
+		ListNode<T>* curX = nullptr;
 		for (int y = 1; y <= height; y++) {
 			curX = curY;
 			for (int x = 1; x <= width; x++) {
@@ -302,8 +313,8 @@ public:
 
 
 void printMatrix() {
-	ListNode* curY = head;
-	ListNode* curX = nullptr;
+	ListNode<T>* curY = head;
+	ListNode<T>* curX = nullptr;
 	for (int y = 1; y <= height; y++) {
 		curX = curY;
 		for (int x = 1; x <= width; x++) {
