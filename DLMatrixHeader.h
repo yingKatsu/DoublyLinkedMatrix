@@ -73,6 +73,8 @@ private:
 	ListNode<T>* head{nullptr}; //ptr to head of a chain of nodes
 	int width{1}, height{1};
 	std::vector<ListNode<T>*> allNodes;
+	
+
 public:
 	//Constructor
 	LinkedMatrix() { 
@@ -313,25 +315,25 @@ public:
 	}
 
 
-void printMatrix() {
-	ListNode<T>* curY = head;
-	ListNode<T>* curX = nullptr;
-	for (int y = 1; y <= height; y++) {
-		curX = curY;
-		for (int x = 1; x <= width; x++) {
-			std::cout << curX->getData();
-			if (x != width) {
-				curX = curX->getRight();
-				std::cout << ",";
+	void printMatrix() {
+		ListNode<T>* curY = head;
+		ListNode<T>* curX = nullptr;
+		for (int y = 1; y <= height; y++) {
+			curX = curY;
+			for (int x = 1; x <= width; x++) {
+				std::cout << curX->getData();
+				if (x != width) {
+					curX = curX->getRight();
+					std::cout << ",";
+				}
+			}
+			std::cout << std::endl;
+			if (y != height) {
+				curY = curY->getDown();
 			}
 		}
 		std::cout << std::endl;
-		if (y != height) {
-			curY = curY->getDown();
-		}
 	}
-	std::cout << std::endl;
-}
 
 
 };
