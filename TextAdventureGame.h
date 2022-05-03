@@ -1,18 +1,29 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <iostream>
 
-class GameRoom {
+class Room {
 private:
-	std::string description;
-	std::vector<std::string> items;
+	std::string name,description;
 public:
-	GameRoom() {
-		//empty space, nothing here
+	//constructor
+	Room() {
 
 	}
-};
 
-class GameFunction {
+	Room(std::string n,std::string d) {
+		//a real room
+		name = n;
+		description = d;
+	}
 
+	//methods
+
+	std::string getName() {
+		return name;
+	}
+
+	std::string getDescription() {
+		return description;
+	}
 };
