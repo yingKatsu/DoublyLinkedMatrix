@@ -9,7 +9,8 @@ template <typename T>
 class ListNode {
 private:
 	//Fields
-	T data{};
+	T data;
+	bool holdsData; //since we will be creating nodes that dont actually hold data yet, this will tell us if the data is valid
 
 	ListNode<T>* up;
 	ListNode<T>* down;
@@ -22,45 +23,80 @@ public:
 		this->down = newDown;
 		this->right = newRight;
 		this->left = newLeft;
+		data = T();
+
+		holdsData = false;
 	}
 
-	//Methods
+	//Methods	
+		
+	//gets data; make sure to CALL isValid() BEFORE CALLING THIS or you WILL GET THE DEFAULT VALUE	
 	T getData() {
 		return data; 
 	}
 
+	//sets the data, and flags this node as one that holds data
 	void setData(T itemptr) {
 		data = itemptr;
+		holdsData = true;
 	}
 
+	//unflags this node as a valid node. 
+	//reassigns the default value to the held data
+	//i reassign because what if we are holding a custom object that dynamically holds stuff
+	//i assume by reassigning it to hold something it calls the destructor on that object, freeing up space?
+	//also returns whether this node actually held something
+	bool deleteData() {
+		if (holdsData) {
+			data = T();
+			holdsData = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	//returns whether this node has actually been assigned data
+	bool isValid() {
+		return holdsData;
+	}
+
+	//sets up ptr
 	void setUp(ListNode<T>* newUp) {
 		this->up = newUp;
 	}
 
+	//gets up ptr
 	ListNode<T>* getUp() {
 		return up;
 	}
 
+	//sets down ptr
 	void setDown(ListNode<T>* newDown) {
 		this->down = newDown;
 	}
 
+	//gets down ptr
 	ListNode<T>* getDown() {
 		return down;
 	}
 
+	//sets left ptr
 	void setLeft(ListNode<T>* newLeft) {
 		this->left = newLeft;
 	}
 
+	//gets left ptr
 	ListNode<T>* getLeft() {
 		return left;
 	}
 
+	//sets right ptr
 	void setRight(ListNode<T>* newRight) {
 		this->right = newRight;
 	}
 
+	//gets right ptr
 	ListNode<T>* getRight() {
 		return right;
 	}
@@ -71,14 +107,19 @@ class LinkedMatrix {
 private:
 	//Fields
 	ListNode<T>* head{nullptr}; //ptr to head of a chain of nodes
-	int width{1}, height{1};
-	std::vector<ListNode<T>*> allNodes;
-	
 
+	ListNode<T>* walker; //movable pointer that can be controlled. 
+	//i would ideally want this as a vector of a bunch of controllable ones, but for the simplicity
+	//of this project, it will be only one
+
+	int width{1}, height{1};
+
+	std::vector<ListNode<T>*> allNodes;
 public:
 	//Constructor
 	LinkedMatrix() { 
 		head = new ListNode<T>{nullptr,nullptr,nullptr,nullptr};
+		walker = head;
 	}
 
 	//Destructor
@@ -88,8 +129,9 @@ public:
 		}
 	}
 
-
 	//Methods
+
+	//expands the matrix by n nodes right
 	void expandX(int n) {
 		ListNode<T>* curY = head;
 		ListNode<T>* curX = nullptr;
@@ -143,6 +185,7 @@ public:
 		width += n;
 	}
 
+	//expands the matrix by n nodes down
 	void expandY(int n) {
 		ListNode<T>* curX = head;
 		ListNode<T>* curY = nullptr;
@@ -197,6 +240,119 @@ public:
 		height += n;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////
+	// walker commands
+	// (the only way i could find to make this weird data structure useful)
+
+	//has the walker move by x and y steps, and whether he should prioritize x or y first
+	//returns whether it was successful or not
+	bool walkerWalk(int xDist, int yDist, bool xfirst) {
+		ListNode<T>* cur = walker;
+		if (xfirst) {
+			if(xDist > 0){ //going right
+				for (int x = 0; x < xDist; x++) {
+					cur = cur->getRight();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			} else if (xDist < 0){ //going left
+				for (int x = 0; x > xDist; x--) {
+					cur = cur->getLeft();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			}
+
+			if (yDist > 0) { //going down
+				for (int y = 0; y < yDist; y++) {
+					cur = cur->getDown();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			} else if (yDist < 0) { //going up
+				for (int y = 0; y > yDist; y--) {
+					cur = cur->getUp();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			}
+		}else{
+			if (yDist > 0) { //going down
+				for (int y = 0; y < yDist; y++) {
+					cur = cur->getDown();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			} else if (yDist < 0) { //going up
+				for (int y = 0; y > yDist; y--) {
+					cur = cur->getUp();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			}
+
+			if (xDist > 0) { //going right
+				for (int x = 0; x < xDist; x++) {
+					cur = cur->getRight();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			} else if (xDist < 0) { //going left
+				for (int x = 0; x > xDist; x--) {
+					cur = cur->getLeft();
+
+					if (cur == nullptr | !cur->isValid()) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		walker = cur;
+		return true;
+	}
+
+	T walkerGetData(){
+		return walker->getData();
+	}
+
+	void walkerSetData(T data){
+		walker->setData(data);
+	}
+
+	void walkerSetPosition(int xDest, int yDest) {
+		ListNode<T>* cur = head;
+
+		for (int y = 0; y < yDest; y++) {
+			cur = cur->getDown();
+		}
+
+		for (int x = 0; x < xDest; x++) {
+			cur = cur->getRight();
+		}
+
+		walker = cur;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	// legacy linked list methods
+	// (you should be mostly using the walker; most of these are O(n^2)!)
+	
+	//gets the data at an (x,y) coordinate
+	//be sure to call isValid(x,y) before you use any data you get
 	T get(int xDest,int yDest) {
 		ListNode<T>* cur = head;
 
@@ -211,7 +367,8 @@ public:
 		return cur->getData();
 	}
 
-	void insert(T item, int xDest, int yDest) {
+	//sets the data at an (x,y) coordinate, flagging it as valid data
+	void set(T item, int xDest, int yDest) {
 		ListNode<T>* cur = head;
 
 		for (int y = 0; y < yDest; y++) {
@@ -225,14 +382,30 @@ public:
 		cur->setData(item);
 	}
 
-	void set(int item, int index) {
+	//checks if node at (x,y) is valid
+	bool isValid(int xDest, int yDest) {
+		ListNode<T>* cur = head;
 
+		for (int y = 0; y < yDest; y++) {
+			cur = cur->getDown();
+		}
+
+		for (int x = 0; x < xDest; x++) {
+			cur = cur->getRight();
+		}
+
+		return cur->isValid();
 	}
 
+	////////////////////////////////////////////////////////////////////////
+	// other methods (helper/debug)
+
+	//gets x length of matrix
 	int getWidth() {
 		return width;
 	}
 
+	//gets y length of matrix
 	int getHeight() {
 		return height;
 	}
@@ -314,7 +487,7 @@ public:
 		std::cout << std::endl;
 	}
 
-
+	//prints the matrix to cout, assuming the datatype is stringable
 	void printMatrix() {
 		ListNode<T>* curY = head;
 		ListNode<T>* curX = nullptr;
@@ -334,6 +507,5 @@ public:
 		}
 		std::cout << std::endl;
 	}
-
 
 };
